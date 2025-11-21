@@ -17,8 +17,8 @@ def grab_data():
     return train_data, scaler_price, scaler_vol
 
 train_data, scaler_price, scaler_vol = grab_data()
-pickle.dump(scaler_price, open('BTC/scaler_price.pkl', 'wb'))
-pickle.dump(scaler_vol, open('BTC/scaler_vol.pkl', 'wb'))
+pickle.dump(scaler_price, open('scaler_price.pkl', 'wb'))
+pickle.dump(scaler_vol, open('scaler_vol.pkl', 'wb'))
 
 def create_sequences(data, seq_length=60):
     X, y = [], []
@@ -29,6 +29,5 @@ def create_sequences(data, seq_length=60):
 
 data_array = train_data.values
 X, y = create_sequences(data_array, 60)
-print(X)
 
-x_train, x_val, y_train, y_val = train_test_split(X, y, test_split=0.2)
+x_train, x_val, y_train, y_val = train_test_split(X, y, test_size=0.2, shuffle=False)

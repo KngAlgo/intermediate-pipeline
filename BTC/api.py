@@ -7,7 +7,7 @@ def get_train_data():
     historical = btc.history(period='5y')
     return historical
 
-def get_binance_data():
+def get_gecko_data():
     url = "https://api.coingecko.com/api/v3/simple/price"
     params = {'ids': 'bitcoin', 'vs_currencies': 'usd'}
     response = requests.get(url, params=params)
