@@ -1,4 +1,4 @@
-from process import x_train, x_val, y_train, y_val
+from data.process import x_train, x_val, y_train, y_val
 from tensorflow import keras
 from keras import layers, Model
 
@@ -23,4 +23,4 @@ model = Model(input, output)
 
 model.compile(loss='mae', metrics=['mae'], optimizer='adam')
 
-model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=100, callbacks=[keras.callbacks.ModelCheckpoint("model.h5", monitor='val_loss')])
+model.fit(x_train, y_train, validation_data=(x_val, y_val), epochs=100, callbacks=[keras.callbacks.ModelCheckpoint("saves/model.h5", monitor='val_loss')])

@@ -1,0 +1,9 @@
+1. Create a website where I (and others) can view my model's predictions.
+- flask
+
+2. Fix data leakage and apply to Real world environments
+- add new data like indicators, news, fomc meetings, etc
+- checkout training data structure and check for testing data leaks etc
+
+3. Enhance model performance
+- different architectures
