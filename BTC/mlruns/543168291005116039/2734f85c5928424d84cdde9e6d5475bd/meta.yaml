@@ -1,0 +1,15 @@
+artifact_uri: file:///workspace/intermediate-pipeline/BTC/mlruns/543168291005116039/2734f85c5928424d84cdde9e6d5475bd/artifacts
+end_time: 1765666175550
+entry_point_name: ''
+experiment_id: '543168291005116039'
+lifecycle_stage: active
+run_id: 2734f85c5928424d84cdde9e6d5475bd
+run_name: BTC-Model-v2(32-64-128)
+run_uuid: 2734f85c5928424d84cdde9e6d5475bd
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1765666173821
+status: 4
+tags: []
+user_id: root

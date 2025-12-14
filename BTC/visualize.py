@@ -5,16 +5,36 @@ import pickle
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-from api import get_train_data
+from data.api import get_train_data
+from data.indicators import add_technical_indicators
+from sklearn.preprocessing import StandardScaler
 
 print("Loading model and scalers...")
-model = keras.models.load_model('model.h5')
-scaler_price = pickle.load(open('scaler_price.pkl', 'rb'))
-scaler_vol = pickle.load(open('scaler_vol.pkl', 'rb'))
+model = keras.models.load_model('saves/model.h5')
+scaler_price = pickle.load(open('saves/scaler_price.pkl', 'rb'))
+scaler_vol = pickle.load(open('saves/scaler_vol.pkl', 'rb'))
 
 print("Fetching data...")
 data = get_train_data()
-data = data.drop(columns=['Dividends', 'Stock Splits'])
+
+# Add technical indicators (same as training)
+print("Adding technical indicators...")
+data = add_technical_indicators(data)
+
+# Drop the same columns as during training to get 13 features
+data = data.drop(columns=['Dividends', 'Stock Splits', 'Body', 'Stochastic',
+                          'Stochastic_Signal', 'MACD_Histogram', 'Upper_Shadow',
+                          'Lower_Shadow', 'EMA_12'])
+
+# Fit scalers for indicators (these weren't saved during training)
+# We fit them on the full dataset to maintain consistency
+scaler_osc = StandardScaler()
+scaler_ind = StandardScaler()
+
+data[['RSI']] = scaler_osc.fit_transform(data[['RSI']])
+data[['MACD', 'MACD_Signal', 'ATR', 'Returns', 'Range', 'SMA_20', 'SMA_50']] = scaler_ind.fit_transform(
+    data[['MACD', 'MACD_Signal', 'ATR', 'Returns', 'Range', 'SMA_20', 'SMA_50']]
+)
 
 # Decide how many days to predict (last N days)
 num_predictions = 100  # Change this to test more/fewer days
@@ -28,14 +48,16 @@ dates = []
 start_idx = len(data) - num_predictions
 for i in range(start_idx, len(data)):
     # Get 60-day window ending at day i-1
-    window = data.iloc[i-60:i].copy()
+    window = data.iloc[i-168:i].copy()
 
-    # Scale the window
+    # Scale the window (price and volume using saved scalers)
     window[['Open', 'High', 'Low', 'Close']] = scaler_price.transform(window[['Open', 'High', 'Low', 'Close']])
     window[['Volume']] = scaler_vol.transform(window[['Volume']])
 
-    # Reshape for model
-    window_array = window.values.reshape(1, 60, 5)
+    # Note: Indicators are already scaled above
+
+    # Reshape for model (now we have 13 features)
+    window_array = window.values.reshape(1, 168, 13)
 
     # Predict
     pred_scaled = model.predict(window_array, verbose=0)

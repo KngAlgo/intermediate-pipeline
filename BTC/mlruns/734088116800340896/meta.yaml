@@ -1,0 +1,6 @@
+artifact_location: file:///workspace/intermediate-pipeline/BTC/mlruns/734088116800340896
+creation_time: 1765672751239
+experiment_id: '734088116800340896'
+last_update_time: 1765672751239
+lifecycle_stage: active
+name: Hourly Data Structure

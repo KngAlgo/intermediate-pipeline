@@ -1,0 +1,15 @@
+artifact_uri: file:///workspace/intermediate-pipeline/BTC/mlruns/680420317624503838/549f26dac0164e718c972f071da1a2a8/artifacts
+end_time: 1764807715567
+entry_point_name: ''
+experiment_id: '680420317624503838'
+lifecycle_stage: active
+run_id: 549f26dac0164e718c972f071da1a2a8
+run_name: Setup Run
+run_uuid: 549f26dac0164e718c972f071da1a2a8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1764807457316
+status: 3
+tags: []
+user_id: root

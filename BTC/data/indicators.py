@@ -48,7 +48,7 @@ def add_technical_indicators(df):
     # Values: 0-100
     # > 70 = Overbought (might fall)
     # < 30 = Oversold (might rise)
-    rsi = RSIIndicator(close=df['Close'], window=14)
+    rsi = RSIIndicator(close=df['Close'], window=336)
     df['RSI'] = rsi.rsi()
 
     # ==========================================
@@ -59,9 +59,9 @@ def add_technical_indicators(df):
     # When MACD crosses below Signal = Bearish
     macd = MACD(
         close=df['Close'],
-        window_slow=26,    # 26-day EMA
-        window_fast=12,    # 12-day EMA
-        window_sign=9      # 9-day Signal line
+        window_slow=624,    # 26-day EMA
+        window_fast=288,    # 12-day EMA
+        window_sign=216      # 9-day Signal line
     )
     df['MACD'] = macd.macd()                    # MACD line
     df['MACD_Signal'] = macd.macd_signal()      # Signal line
@@ -75,15 +75,15 @@ def add_technical_indicators(df):
     # EMA = Exponential Moving Average (recent prices weighted more)
 
     # Short-term trend (20 days)
-    sma_20 = SMAIndicator(close=df['Close'], window=20)
+    sma_20 = SMAIndicator(close=df['Close'], window=480)
     df['SMA_20'] = sma_20.sma_indicator()
 
     # Medium-term trend (50 days)
-    sma_50 = SMAIndicator(close=df['Close'], window=50)
+    sma_50 = SMAIndicator(close=df['Close'], window=1200)
     df['SMA_50'] = sma_50.sma_indicator()
 
     # Exponential moving average (responds faster to price changes)
-    ema_12 = EMAIndicator(close=df['Close'], window=12)
+    ema_12 = EMAIndicator(close=df['Close'], window=288)
     df['EMA_12'] = ema_12.ema_indicator()
 
     # ==========================================
@@ -92,7 +92,7 @@ def add_technical_indicators(df):
     # Measures market volatility
     # High ATR = High volatility (big price swings)
     # Low ATR = Low volatility (stable prices)
-    atr = AverageTrueRange(high=df['High'], low=df['Low'], close=df['Close'], window=14)
+    atr = AverageTrueRange(high=df['High'], low=df['Low'], close=df['Close'], window=336)
     df['ATR'] = atr.average_true_range()
 
     # ==========================================

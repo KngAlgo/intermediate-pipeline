@@ -2,10 +2,16 @@ import yfinance as yf
 import requests
 import pandas as pd
 
-def get_train_data():
+def get_1d_train_data():
     btc = yf.Ticker('BTC-USD')
     historical = btc.history(period='5y')
     return historical
+
+def get_1hr_train_data():
+    btc = yf.Ticker('BTC-USD')
+    historical = btc.history(period='730d', interval='1h')
+    return historical
+
 
 def get_gecko_data():
     url = "https://api.coingecko.com/api/v3/simple/price"

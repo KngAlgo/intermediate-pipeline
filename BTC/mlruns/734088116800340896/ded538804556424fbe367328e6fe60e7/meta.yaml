@@ -1,0 +1,15 @@
+artifact_uri: file:///workspace/intermediate-pipeline/BTC/mlruns/734088116800340896/ded538804556424fbe367328e6fe60e7/artifacts
+end_time: 1765674099596
+entry_point_name: ''
+experiment_id: '734088116800340896'
+lifecycle_stage: active
+run_id: ded538804556424fbe367328e6fe60e7
+run_name: First 1HR Structure Test
+run_uuid: ded538804556424fbe367328e6fe60e7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1765673588690
+status: 3
+tags: []
+user_id: root

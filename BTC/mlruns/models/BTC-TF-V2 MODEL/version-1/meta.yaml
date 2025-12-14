@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1765666777895
+current_stage: None
+description: null
+last_updated_timestamp: 1765666777895
+name: BTC-TF-V2 MODEL
+run_id: 61554811d0a541f2a71f88219ce769a0
+run_link: null
+source: file:///workspace/intermediate-pipeline/BTC/mlruns/543168291005116039/61554811d0a541f2a71f88219ce769a0/artifacts/tf_model
+status: READY
+status_message: null
+storage_location: file:///workspace/intermediate-pipeline/BTC/mlruns/543168291005116039/61554811d0a541f2a71f88219ce769a0/artifacts/tf_model
+user_id: null
+version: 1

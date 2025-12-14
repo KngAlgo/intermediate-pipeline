@@ -8,7 +8,9 @@ import os
 
 # Add BTC directory to path to import api module
 sys.path.append(os.path.join(os.path.dirname(__file__), 'BTC'))
-from data.api import get_train_data, get_gecko_data
+from data.api import get_1hr_train_data, get_gecko_data
+from data.indicators import add_technical_indicators
+from sklearn.preprocessing import StandardScaler
 
 app = Flask(__name__)
 
@@ -18,9 +20,11 @@ app = Flask(__name__)
 # This happens when the server starts, not on every request
 # Loading model is expensive - we only want to do it once
 print("Loading model and scalers...")
-model = keras.models.load_model('BTC/model.h5')
-scaler_price = pickle.load(open('BTC/scaler_price.pkl', 'rb'))
-scaler_vol = pickle.load(open('BTC/scaler_vol.pkl', 'rb'))
+model = keras.models.load_model('saves/1hr_V2model.h5')
+scaler_price = pickle.load(open('saves/scaler_price.pkl', 'rb'))
+scaler_vol = pickle.load(open('saves/scaler_vol.pkl', 'rb'))
+scaler_osc = pickle.load(open('saves/scaler_osc.pkl', 'rb'))
+scaler_ind = pickle.load(open('saves/scaler_ind.pkl', 'rb'))
 print("Model loaded successfully!")
 
 
@@ -29,21 +33,37 @@ def get_prediction():
     Gets the BTC price prediction for tomorrow
 
     How it works:
-    1. Fetch last 60 days of historical data (our model needs 60-day window)
-    2. Preprocess: drop unnecessary columns
-    3. Scale the data using the same scalers from training
-    4. Reshape into format model expects: (1 sample, 60 timesteps, 5 features)
-    5. Get prediction (scaled value)
-    6. Inverse transform to get real dollar value
+    1. Fetch historical data (need enough for indicators to calculate)
+    2. Add technical indicators (RSI, MACD, SMA, etc.)
+    3. Preprocess: drop unnecessary columns to get 13 features
+    4. Scale the data using the same scalers from training
+    5. Get last 60 days and reshape: (1 sample, 60 timesteps, 13 features)
+    6. Get prediction (scaled value)
+    7. Inverse transform to get real dollar value
     """
-    # Step 1: Get last 60 days of data
-    data = get_train_data()
-    period = data[-60:].copy()  # Last 60 days
+    # Step 1: Get historical data
+    data = get_1hr_train_data()
 
-    # Step 2: Drop columns we didn't train on
-    period = period.drop(columns=['Dividends', 'Stock Splits'])
+    # Step 2: Add technical indicators (same as training)
+    data = add_technical_indicators(data)
 
-    # Step 3: Scale the data (MUST use transform, not fit_transform!)
+    # Step 3: Drop the same columns as during training to get 13 features
+    data = data.drop(columns=['Dividends', 'Stock Splits', 'Body', 'Stochastic',
+                              'Stochastic_Signal', 'MACD_Histogram', 'Upper_Shadow',
+                              'Lower_Shadow', 'EMA_12'])
+
+    # Step 4: Fit scalers for indicators (these weren't saved during training)
+    # We fit them on the full dataset to maintain consistenc
+
+    data[['RSI']] = scaler_osc.transform(data[['RSI']])
+    data[['MACD', 'MACD_Signal', 'ATR', 'Returns', 'Range', 'SMA_20', 'SMA_50']] = scaler_ind.transform(
+        data[['MACD', 'MACD_Signal', 'ATR', 'Returns', 'Range', 'SMA_20', 'SMA_50']]
+    )
+
+    # Get last 60 days
+    period = data[-168:].copy()
+
+    # Step 5: Scale price and volume (MUST use transform, not fit_transform!)
     # We use transform() because we already fit the scaler during training
     # fit_transform() would learn NEW min/max values, which would be wrong
     period[['Open', 'High', 'Low', 'Close']] = scaler_price.transform(
@@ -51,10 +71,12 @@ def get_prediction():
     )
     period[['Volume']] = scaler_vol.transform(period[['Volume']])
 
-    # Step 4: Reshape for LSTM input
+    # Note: Indicators are already scaled above
+
+    # Step 6: Reshape for LSTM input
     # LSTM expects shape: (batch_size, timesteps, features)
-    # We have: (60 days, 5 features) -> reshape to (1, 60, 5)
-    period_reshaped = period.values.reshape(1, 60, 5)
+    # We have: (60 days, 13 features) -> reshape to (1, 60, 13)
+    period_reshaped = period.values.reshape(1, 168, 13)
 
     # Step 5: Get prediction (this is a scaled value between 0 and 1)
     pred = model.predict(period_reshaped, verbose=0)
